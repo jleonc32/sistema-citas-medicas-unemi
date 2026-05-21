@@ -1,36 +1,53 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Registro - Citas Médicas</title>
-</head>
-<body>
-    <h2>Regístrate como Paciente</h2>
-    
-    <form action="/registro" method="POST">
-        <label>Cédula:</label><br>
-        <input type="text" name="cedula" required><br><br>
+{% extends "base.html" %}
 
-        <label>Nombre Completo:</label><br>
-        <input type="text" name="nombre" required><br><br>
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 mb-5">
+            <div class="card-body p-4">
+                <h3 class="card-title text-center mb-4 fw-bold text-primary">Registro de Paciente</h3>
+                
+                <form action="/registro" method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Cédula:</label>
+                            <input type="text" name="cedula" class="form-control" placeholder="Ej. 0912345678" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Teléfono:</label>
+                            <input type="text" name="telefono" class="form-control" placeholder="0991234567">
+                        </div>
+                    </div>
 
-        <label>Correo:</label><br>
-        <input type="email" name="email" required><br><br>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nombre Completo:</label>
+                        <input type="text" name="nombre" class="form-control" placeholder="Ej. Leonel Andrés Messi" required>
+                    </div>
 
-        <label>Contraseña:</label><br>
-        <input type="password" name="password" required><br><br>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Correo Electrónico:</label>
+                        <input type="email" name="email" class="form-control" placeholder="ejemplo@correo.com" required>
+                    </div>
 
-        <label>Teléfono:</label><br>
-        <input type="text" name="telefono"><br><br>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Dirección:</label>
+                        <input type="text" name="direccion" class="form-control" placeholder="Ej. Guayaquil, Ecuador">
+                    </div>
 
-        <label>Dirección:</label><br>
-        <input type="text" name="direccion"><br><br>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Contraseña:</label>
+                        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                    </div>
 
-        <button type="submit">Completar Registro</button>
-    </form>
-    
-    <br>
-    <hr>
-    <p>¿Ya tienes una cuenta? <a href="/login">Inicia Sesión aquí</a></p>
-</body>
-</html>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Completar Registro</button>
+                </form>
+
+                <hr class="my-4">
+                <p class="text-center mb-0 text-muted">¿Ya tienes una cuenta? <br>
+                    <a href="/login" class="text-decoration-none fw-bold mt-1 d-inline-block">Inicia Sesión aquí</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

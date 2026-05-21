@@ -1,23 +1,32 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Iniciar Sesión - Citas Médicas</title>
-</head>
-<body>
-    <h2>Iniciar Sesión</h2>
-    
-    <form action="/login" method="POST">
-        <label>Correo Electrónico:</label><br>
-        <input type="email" name="email" required><br><br>
+{% extends "base.html" %}
 
-        <label>Contraseña:</label><br>
-        <input type="password" name="password" required><br><br>
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h3 class="card-title text-center mb-4 fw-bold text-primary">Iniciar Sesión</h3>
+                
+                <form action="/login" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Correo Electrónico:</label>
+                        <input type="email" name="email" class="form-control" placeholder="ejemplo@correo.com" required>
+                    </div>
 
-        <button type="submit">Entrar al Sistema</button>
-    </form>
-    <br>
-    <hr>
-    <p>¿Aún no eres paciente de la clínica? <a href="/registro">Regístrate aquí</a></p>
-</body>
-</html>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Contraseña:</label>
+                        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Entrar al Sistema</button>
+                </form>
+
+                <hr class="my-4">
+                <p class="text-center mb-0 text-muted">¿Aún no eres paciente de la clínica? <br> 
+                    <a href="/registro" class="text-decoration-none fw-bold mt-1 d-inline-block">Regístrate aquí</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

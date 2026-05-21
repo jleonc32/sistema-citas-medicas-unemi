@@ -1,17 +1,34 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Panel de Paciente - Citas UNEMI</title>
-</head>
-<body>
-    <h1>Bienvenido a tu zona privada, {{ nombre_usuario }} 🏥</h1>
-    
-    <p>Aquí es donde próximamente podrás agendar tus citas, ver tu historial médico y conectarte a las videollamadas.</p>
+{% extends "base.html" %}
 
-    <br><br>
-    <a href="/logout">
-        <button style="color: red;">Cerrar Sesión</button>
-    </a>
-</body>
-</html>
+{% block content %}
+<div class="row mt-5">
+    <div class="col-md-12 text-center">
+        <h1 class="fw-bold text-primary mb-3">¡Bienvenido, {{ nombre_usuario }}! 🏥</h1>
+        <p class="lead text-muted">Desde aquí podrás gestionar todas tus citas médicas de forma rápida y segura.</p>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 text-center p-4 h-100">
+            <h4 class="fw-bold">Agendar Cita</h4>
+            <p class="text-muted">Programa una nueva consulta virtual o presencial.</p>
+            <button class="btn btn-primary mt-auto" disabled>Próximamente</button>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 text-center p-4 h-100">
+            <h4 class="fw-bold">Mis Citas</h4>
+            <p class="text-muted">Revisa tu historial y próximas atenciones.</p>
+            <button class="btn btn-outline-primary mt-auto" disabled>Próximamente</button>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 text-center p-4 h-100">
+            <h4 class="fw-bold">Mi Perfil</h4>
+            <p class="text-muted">Actualiza tu información personal.</p>
+            <button class="btn btn-outline-secondary mt-auto" disabled>Próximamente</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
