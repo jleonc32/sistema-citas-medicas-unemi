@@ -83,6 +83,19 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+# 5. RUTA PARA VER EL PERFIL DEL USUARIO
+@app.route('/perfil')
+def perfil():
+    if 'id_usuario' in session:
+        # Buscamos al usuario en la base de datos por su ID
+        usuario = Usuario.query.get(session['id_usuario'])
+        # Buscamos sus datos adicionales en la tabla paciente
+        paciente = Paciente.query.filter_by(id_usuario=usuario.id_usuario).first()
+        
+        return render_template('perfil.html', usuario=usuario, paciente=paciente)
+    else:
+        return redirect(url_for('login'))
+
 # ==========================================
 # ENCENDIDO DEL SERVIDOR
 # ==========================================
