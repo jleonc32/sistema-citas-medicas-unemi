@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - Citas Médicas</title>
+</head>
+<body>
+    <h2>Regístrate como Paciente</h2>
+    
+    <form action="/registro" method="POST">
+        <label>Cédula:</label><br>
+        <input type="text" name="cedula" required><br><br>
+
+        <label>Nombre Completo:</label><br>
+        <input type="text" name="nombre" required><br><br>
+
+        <label>Correo:</label><br>
+        <input type="email" name="email" required><br><br>
+
+        <label>Contraseña:</label><br>
+        <input type="password" name="password" required><br><br>
+
+        <label>Teléfono:</label><br>
+        <input type="text" name="telefono"><br><br>
+
+        <label>Dirección:</label><br>
+        <input type="text" name="direccion"><br><br>
+
+        <button type="submit">Completar Registro</button>
+    </form>
+</body>
+</html>
