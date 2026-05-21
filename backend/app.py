@@ -1,8 +1,14 @@
-from flask import render_template, request
+# Importamos session, redirect y url_for
+from flask import render_template, request, session, redirect, url_for 
 from conexion import app, db
 from modelos import Usuario, Paciente
-# Agregamos "check_password_hash" para verificar la clave
 from werkzeug.security import generate_password_hash, check_password_hash 
+
+# ==========================================
+# CONFIGURACIÓN DE SEGURIDAD
+# ==========================================
+# Flask necesita una llave secreta para encriptar la memoria de la sesión
+app.secret_key = 'clave_super_secreta_unemi_2026' 
 
 # ==========================================
 # RUTAS DE LA PÁGINA WEB
@@ -11,7 +17,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 def inicio():
     return "<h1>¡Hola UNEMI! 🎓</h1> <p>El servidor de Citas Médicas está funcionando al 100% 🚀</p>"
 
-# 1. RUTA DE REGISTRO (Ya la tienes dominada)
+# 1. RUTA DE REGISTRO
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'GET':
@@ -35,28 +41,47 @@ def registro():
         db.session.add(nuevo_paciente)
         db.session.commit() 
 
-        return "<h2>¡Registro exitoso, bro! 🎉 Tu cuenta está lista.</h2>"
+        return "<h2>¡Registro exitoso! 🎉 Ve a <a href='/login'>Iniciar Sesión</a>.</h2>"
 
-# 2. NUEVA RUTA: INICIO DE SESIÓN (LOGIN)
+# 2. RUTA DE INICIO DE SESIÓN
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # Si entra normal, le mostramos el formulario HTML
     if request.method == 'GET':
         return render_template('login.html')
     
-    # Si le da al botón de Entrar
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
 
-        # Buscamos en la base de datos si existe un usuario con ese correo
         usuario = Usuario.query.filter_by(email=email).first()
 
-        # Si el usuario existe y la contraseña coincide con el hash guardado...
         if usuario and check_password_hash(usuario.password_hash, password):
-            return f"<h2>¡Bienvenido de vuelta, {usuario.nombre}! 🏥 Tienes acceso al sistema.</h2>"
+            # ¡AQUÍ ESTÁ LA MAGIA DE LA MEMORIA! Guardamos sus datos en la sesión
+            session['id_usuario'] = usuario.id_usuario
+            session['nombre'] = usuario.nombre
+            
+            # Lo redirigimos a su zona privada
+            return redirect(url_for('dashboard'))
         else:
-            return "<h2>❌ Error: Correo o contraseña incorrectos. Intenta de nuevo.</h2>"
+            return "<h2>❌ Error: Correo o contraseña incorrectos.</h2>"
+
+# 3. NUEVA RUTA: PANEL DE CONTROL PRIVADO (DASHBOARD)
+@app.route('/dashboard')
+def dashboard():
+    # Verificamos si el usuario tiene una sesión activa
+    if 'id_usuario' in session:
+        # Si tiene memoria, le mostramos su página privada
+        return render_template('dashboard.html', nombre_usuario=session['nombre'])
+    else:
+        # Si un intruso intenta entrar directo a /dashboard, lo pateamos al login
+        return redirect(url_for('login'))
+
+# 4. NUEVA RUTA: CERRAR SESIÓN
+@app.route('/logout')
+def logout():
+    # Borramos la memoria
+    session.clear()
+    return redirect(url_for('login'))
 
 # ==========================================
 # ENCENDIDO DEL SERVIDOR
