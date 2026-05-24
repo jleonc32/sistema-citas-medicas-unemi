@@ -1,7 +1,7 @@
 # Importamos session, redirect y url_for
 from flask import render_template, request, session, redirect, url_for 
 from conexion import app, db
-from modelos import Usuario, Paciente
+from modelos import Usuario, Paciente, Medico
 from werkzeug.security import generate_password_hash, check_password_hash 
 
 # ==========================================
@@ -43,7 +43,7 @@ def registro():
 
         return "<h2>¡Registro exitoso! 🎉 Ve a <a href='/login'>Iniciar Sesión</a>.</h2>"
 
-# 2. RUTA DE INICIO DE SESIÓN
+# 2. RUTA DE INICIO DE SESIÓN (LOGIN INTELIGENTE)
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -56,14 +56,38 @@ def login():
         usuario = Usuario.query.filter_by(email=email).first()
 
         if usuario and check_password_hash(usuario.password_hash, password):
-            # ¡AQUÍ ESTÁ LA MAGIA DE LA MEMORIA! Guardamos sus datos en la sesión
+            # Guardamos los datos básicos en la memoria de la sesión
             session['id_usuario'] = usuario.id_usuario
             session['nombre'] = usuario.nombre
             
-            # Lo redirigimos a su zona privada
-            return redirect(url_for('dashboard'))
+            # EL SEMÁFORO: Verificamos en qué tabla existe este usuario
+            es_paciente = Paciente.query.filter_by(id_usuario=usuario.id_usuario).first()
+            es_medico = Medico.query.filter_by(id_usuario=usuario.id_usuario).first()
+
+            if es_paciente:
+                # Si es paciente, le damos esa etiqueta y lo mandamos a su panel
+                session['rol'] = 'paciente'
+                return redirect(url_for('dashboard'))
+            elif es_medico:
+                # Si es médico, le damos la etiqueta y lo mandamos a su panel VIP
+                session['rol'] = 'medico'
+                return redirect(url_for('dashboard_medico'))
+            else:
+                return "<h2>❌ Error: Usuario registrado, pero no tiene rol asignado.</h2>"
         else:
             return "<h2>❌ Error: Correo o contraseña incorrectos.</h2>"
+
+# ==========================================
+# RUTA VIP: PANEL DEL MÉDICO
+# ==========================================
+@app.route('/dashboard-medico')
+def dashboard_medico():
+    # Solo dejamos entrar si hay sesión activa Y si su rol es 'medico'
+    if 'id_usuario' in session and session.get('rol') == 'medico':
+        return render_template('dashboard_medico.html', nombre_usuario=session['nombre'])
+    else:
+        # Si un paciente intenta entrar aquí de intruso, lo pateamos al login
+        return redirect(url_for('login'))
 
 # 3. NUEVA RUTA: PANEL DE CONTROL PRIVADO (DASHBOARD)
 @app.route('/dashboard')

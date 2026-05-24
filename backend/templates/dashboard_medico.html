@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-md-12 text-center">
+        <h1 class="fw-bold text-success mb-3">¡Bienvenido, {{ nombre_usuario }}! 🩺</h1>
+        <p class="lead text-muted">Panel de Control Médico - Gestión de Consultas y Pacientes.</p>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-success text-center p-4 h-100 border-top border-4">
+            <h4 class="fw-bold">Mi Agenda de Hoy</h4>
+            <p class="text-muted">Revisa las citas programadas para el día.</p>
+            <button class="btn btn-success mt-auto" disabled>Ver Agenda</button>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 text-center p-4 h-100">
+            <h4 class="fw-bold">Solicitudes Pendientes</h4>
+            <p class="text-muted">Confirma o rechaza nuevas citas de pacientes.</p>
+            <button class="btn btn-outline-success mt-auto" disabled>Revisar Solicitudes</button>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 text-center p-4 h-100">
+            <h4 class="fw-bold">Mi Horario</h4>
+            <p class="text-muted">Configura tus días y horas de atención.</p>
+            <button class="btn btn-outline-secondary mt-auto" disabled>Configurar Horario</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
