@@ -22,7 +22,7 @@ class Paciente(db.Model):
 class Medico(db.Model):
     __tablename__ = 'medicos'
     id_medico = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    # Llave foránea que conecta con Usuario
+    # Llave foránea que conecta con Usuario 
     id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id_usuario', ondelete='CASCADE'), unique=True, nullable=False)
     especialidad_id = db.Column(db.Integer) 
     telefono = db.Column(db.String(15))
@@ -45,3 +45,10 @@ class Cita(db.Model):
     estado = db.Column(db.Enum('Pendiente', 'Confirmada', 'Cancelada', 'Completada'), default='Pendiente')
     motivo_consulta = db.Column(db.Text)
     costo = db.Column(db.Numeric(10, 2))
+    
+# 5. TABLA: ESPECIALIDADES
+class Especialidad(db.Model):
+    __tablename__ = 'especialidades'
+    id_especialidad = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    descripcion = db.Column(db.Text)

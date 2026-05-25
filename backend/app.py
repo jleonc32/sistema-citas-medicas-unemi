@@ -1,7 +1,7 @@
 # Importamos session, redirect y url_for
 from flask import render_template, request, session, redirect, url_for 
 from conexion import app, db
-from modelos import Usuario, Paciente, Medico
+from modelos import Usuario, Paciente, Medico, Especialidad, Cita
 from werkzeug.security import generate_password_hash, check_password_hash 
 
 # ==========================================
@@ -117,6 +117,49 @@ def perfil():
         paciente = Paciente.query.filter_by(id_usuario=usuario.id_usuario).first()
         
         return render_template('perfil.html', usuario=usuario, paciente=paciente)
+    else:
+        return redirect(url_for('login'))
+
+# 6. RUTA PARA AGENDAR CITA MEDICA
+# ==========================================
+# RUTA: AGENDAR NUEVA CITA (PACIENTE)
+# ==========================================
+@app.route('/agendar', methods=['GET', 'POST'])
+def agendar_cita():
+    if 'id_usuario' in session and session.get('rol') == 'paciente':
+        if request.method == 'GET':
+            especialidades = Especialidad.query.all()
+            medicos = db.session.query(Medico, Usuario).join(Usuario, Medico.id_usuario == Usuario.id_usuario).all()
+            return render_template('agendar_cita.html', especialidades=especialidades, medicos=medicos)
+        
+        if request.method == 'POST':
+            # 1. Atrapamos los datos que el usuario escribió en el HTML
+            medico_id = request.form['medico_id']
+            fecha = request.form['fecha']
+            hora = request.form['hora']
+            motivo = request.form['motivo']
+            
+            # 2. Buscamos cuál es el 'id_paciente' del usuario que está conectado ahora mismo
+            paciente_actual = Paciente.query.filter_by(id_usuario=session['id_usuario']).first()
+            
+            # 3. Armamos la nueva cita para la base de datos
+            nueva_cita = Cita(
+                paciente_id=paciente_actual.id_paciente,
+                medico_id=medico_id,
+                fecha=fecha,
+                hora=hora,
+                modalidad='Presencial', # Por defecto lo ponemos presencial por ahora
+                estado='Pendiente',
+                motivo_consulta=motivo
+            )
+            
+            # 4. Guardamos en MySQL
+            db.session.add(nueva_cita)
+            db.session.commit()
+            
+            # 5. Lo devolvemos al panel azul
+            return redirect(url_for('dashboard'))
+            
     else:
         return redirect(url_for('login'))
 
