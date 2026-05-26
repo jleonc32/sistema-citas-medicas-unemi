@@ -187,6 +187,52 @@ def mis_citas():
     else:
         return redirect(url_for('login'))
 
+#ruta 8
+# ==========================================
+# RUTA: SOLICITUDES PENDIENTES (MÉDICO)
+# ==========================================
+@app.route('/solicitudes-medico')
+def solicitudes_medico():
+    if 'id_usuario' in session and session.get('rol') == 'medico':
+        # 1. Buscamos qué médico está logueado
+        medico_actual = Medico.query.filter_by(id_usuario=session['id_usuario']).first()
+        
+        # 2. Buscamos todas sus citas que estén en estado 'Pendiente'
+        # Cruzamos con Paciente y Usuario para saber el nombre de quién pide la cita
+        citas_pendientes = db.session.query(Cita, Paciente, Usuario)\
+            .join(Paciente, Cita.paciente_id == Paciente.id_paciente)\
+            .join(Usuario, Paciente.id_usuario == Usuario.id_usuario)\
+            .filter(Cita.medico_id == medico_actual.id_medico)\
+            .filter(Cita.estado == 'Pendiente')\
+            .order_by(Cita.fecha, Cita.hora).all()
+            
+        return render_template('solicitudes_medico.html', citas=citas_pendientes)
+    else:
+        return redirect(url_for('login'))
+
+# ruta 9
+# ==========================================
+# ACCIÓN: CONFIRMAR O CANCELAR CITA
+# ==========================================
+@app.route('/actualizar-cita/<int:id_cita>/<string:accion>')
+def actualizar_cita(id_cita, accion):
+    if 'id_usuario' in session and session.get('rol') == 'medico':
+        # Buscamos la cita específica en la base de datos
+        cita = Cita.query.get(id_cita)
+        
+        if cita:
+            if accion == 'confirmar':
+                cita.estado = 'Confirmada'
+            elif accion == 'cancelar':
+                cita.estado = 'Cancelada'
+            
+            # Guardamos el nuevo estado en MySQL
+            db.session.commit()
+            
+        return redirect(url_for('solicitudes_medico'))
+    else:
+        return redirect(url_for('login'))
+
 # ==========================================
 # ENCENDIDO DEL SERVIDOR
 # ==========================================
