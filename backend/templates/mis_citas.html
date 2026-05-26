@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-primary"><i class="bi bi-journal-medical"></i> Mi Historial de Citas</h2>
+            <a href="/dashboard" class="btn btn-outline-secondary">Volver al Panel</a>
+        </div>
+
+        <div class="card shadow border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 text-center align-middle">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Fecha y Hora</th>
+                                <th>Médico Tratante</th>
+                                <th>Especialidad</th>
+                                <th>Modalidad</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if citas %}
+                                {% for cita, medico, usuario, especialidad in citas %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ cita.fecha }}</strong><br>
+                                        <small class="text-muted">{{ cita.hora }}</small>
+                                    </td>
+                                    <td>{{ usuario.nombre }}</td>
+                                    <td>{{ especialidad.nombre }}</td>
+                                    <td>{{ cita.modalidad }}</td>
+                                    <td>
+                                        {% if cita.estado == 'Pendiente' %}
+                                            <span class="badge bg-warning text-dark">Pendiente</span>
+                                        {% elif cita.estado == 'Confirmada' %}
+                                            <span class="badge bg-success">Confirmada</span>
+                                        {% elif cita.estado == 'Cancelada' %}
+                                            <span class="badge bg-danger">Cancelada</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ cita.estado }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">
+                                        No tienes citas médicas programadas aún. <br>
+                                        <a href="/agendar" class="btn btn-sm btn-primary mt-2">Agendar una ahora</a>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

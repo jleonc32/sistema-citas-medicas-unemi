@@ -162,6 +162,30 @@ def agendar_cita():
             
     else:
         return redirect(url_for('login'))
+    
+#ruta 7
+# ==========================================
+# RUTA: MIS CITAS (PACIENTE)
+# ==========================================
+@app.route('/mis-citas')
+def mis_citas():
+    # Validamos que sea un paciente
+    if 'id_usuario' in session and session.get('rol') == 'paciente':
+        
+        # 1. Buscamos quién es el paciente logueado
+        paciente_actual = Paciente.query.filter_by(id_usuario=session['id_usuario']).first()
+        
+        # 2. Traemos su historial de citas cruzando datos con Médico, Usuario y Especialidad
+        citas = db.session.query(Cita, Medico, Usuario, Especialidad)\
+            .join(Medico, Cita.medico_id == Medico.id_medico)\
+            .join(Usuario, Medico.id_usuario == Usuario.id_usuario)\
+            .join(Especialidad, Medico.especialidad_id == Especialidad.id_especialidad)\
+            .filter(Cita.paciente_id == paciente_actual.id_paciente)\
+            .order_by(Cita.fecha.desc(), Cita.hora.desc()).all()
+            
+        return render_template('mis_citas.html', citas=citas)
+    else:
+        return redirect(url_for('login'))
 
 # ==========================================
 # ENCENDIDO DEL SERVIDOR
