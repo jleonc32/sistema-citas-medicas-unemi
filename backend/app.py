@@ -141,35 +141,31 @@ def agendar_cita():
             return render_template('agendar_cita.html', especialidades=especialidades, medicos=medicos)
         
         if request.method == 'POST':
-            # 1. Atrapamos los datos que el usuario escribió en el HTML
+            # 1. Atrapamos los datos del formulario
             medico_id = request.form['medico_id']
             fecha = request.form['fecha']
             hora = request.form['hora']
             motivo = request.form['motivo']
+            modalidad = request.form['modalidad'] # <--- NUEVO: Atrapamos la modalidad
             
-            # 2. Buscamos cuál es el 'id_paciente' del usuario que está conectado ahora mismo
+            # 2. Buscamos al paciente actual
             paciente_actual = Paciente.query.filter_by(id_usuario=session['id_usuario']).first()
             
-            # 3. Armamos la nueva cita para la base de datos
+            # 3. Armamos la nueva cita
             nueva_cita = Cita(
                 paciente_id=paciente_actual.id_paciente,
                 medico_id=medico_id,
                 fecha=fecha,
                 hora=hora,
-                modalidad='Presencial', # Por defecto lo ponemos presencial por ahora
+                modalidad=modalidad, # <--- NUEVO: Usamos la variable elegida por el usuario
                 estado='Pendiente',
                 motivo_consulta=motivo
             )
             
-            # 4. Guardamos en MySQL
+            # 4. Guardamos y volvemos al panel
             db.session.add(nueva_cita)
             db.session.commit()
-            
-            # 5. Lo devolvemos al panel azul
             return redirect(url_for('dashboard'))
-            
-    else:
-        return redirect(url_for('login'))
     
 #ruta 7
 # ==========================================
@@ -261,6 +257,18 @@ def agenda_medico():
         return render_template('agenda_medico.html', citas=citas_confirmadas)
     else:
         return redirect(url_for('login'))
+    
+#ruta 11
+# ==========================================
+# API: OBTENER HORARIO DEL MÉDICO (JSON)
+# ==========================================
+@app.route('/api/medico/<int:id_medico>/horario')
+def obtener_horario_medico(id_medico):
+    medico = Medico.query.get(id_medico)
+    if medico and medico.horario_atencion:
+        # Devolvemos directamente el JSON de la base de datos
+        return medico.horario_atencion
+    return {} # Si no hay horario, devolvemos un objeto vacío
 
 # ==========================================
 # ENCENDIDO DEL SERVIDOR

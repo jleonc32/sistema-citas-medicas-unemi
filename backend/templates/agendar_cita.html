@@ -32,19 +32,33 @@
                                     <option value="{{ medico.id_medico }}">{{ usuario.nombre }}</option>
                                 {% endfor %}
                             </select>
+
+                            <div id="mensaje-horario" class="alert alert-info mt-2 d-none" role="alert">
+                                <i class="bi bi-clock-history"></i> <strong>Horario de atención:</strong> 
+                                <span id="texto-horario"></span>
+                            </div>
                         </div>
                     </div>
 
-                    <h5 class="fw-bold border-bottom pb-2 mb-3 text-primary">2. Fecha y Hora</h5>
-                    
+                    <h5 class="fw-bold border-bottom pb-2 mb-3 text-primary mt-4">2. Detalles de la Consulta</h5>
+
                     <div class="row mb-4">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label fw-semibold">Fecha de la Consulta:</label>
                             <input type="date" class="form-control" name="fecha" required>
                         </div>
-                        <div class="col-md-6 mb-3">
+    
+                        <div class="col-md-4 mb-3">
                             <label class="form-label fw-semibold">Hora de la Consulta:</label>
                             <input type="time" class="form-control" name="hora" required>
+                        </div>
+    
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Modalidad:</label>
+                            <select class="form-select" name="modalidad" required>
+                                <option value="Presencial">🏥 Presencial (Clínica)</option>
+                                <option value="Virtual">💻 Virtual (Telemedicina)</option>
+                            </select>
                         </div>
                     </div>
 
@@ -63,4 +77,38 @@
         </div>
     </div>
 </div>
+
+<script>
+    // 1. Atrapamos los elementos de la pantalla
+    const selectMedico = document.querySelector('select[name="medico_id"]');
+    const divMensaje = document.getElementById('mensaje-horario');
+    const spanTexto = document.getElementById('texto-horario');
+
+    // 2. Escuchamos cada vez que el paciente cambie de doctor
+    selectMedico.addEventListener('change', function() {
+        const idMedico = this.value;
+        
+        // 3. Vamos a Flask por los datos (sin recargar la página)
+        fetch(`/api/medico/${idMedico}/horario`)
+            .then(response => response.json())
+            .then(data => {
+                // Si el doctor tiene un horario guardado en la base de datos
+                if (Object.keys(data).length > 0) {
+                    let horarioTexto = "";
+                    // Traducimos el JSON a texto legible
+                    for (const [dia, horas] of Object.entries(data)) {
+                        let diaMayuscula = dia.charAt(0).toUpperCase() + dia.slice(1);
+                        horarioTexto += `${diaMayuscula}: ${horas} | `;
+                    }
+                    // Quitamos el último separador y mostramos el cuadro azul
+                    spanTexto.innerText = horarioTexto.slice(0, -3);
+                    divMensaje.classList.remove('d-none');
+                } else {
+                    spanTexto.innerText = "Horario no especificado por el médico.";
+                    divMensaje.classList.remove('d-none');
+                }
+            })
+            .catch(error => console.error('Error de conexión:', error));
+    });
+</script>
 {% endblock %}
