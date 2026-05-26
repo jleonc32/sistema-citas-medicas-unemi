@@ -12,7 +12,11 @@
             <a class="navbar-brand" href="/">🏥 Clínica UNEMI</a>
             <div class="d-flex">
                 {% if session.get('id_usuario') %}
-                    <a href="/dashboard" class="btn btn-outline-light me-2">Inicio</a>
+                    {% if session.get('rol') == 'medico' %}
+                        <a class="btn btn-outline-light me-2" href="/dashboard-medico">Inicio</a>
+                    {% else %}
+                         <a class="btn btn-outline-light me-2" href="/dashboard">Inicio</a>
+                    {% endif %}
                     <a href="/logout" class="btn btn-danger">Cerrar Sesión</a>
                 {% else %}
                     <a href="/login" class="btn btn-outline-light me-2">Ingresar</a>

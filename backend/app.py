@@ -90,15 +90,23 @@ def dashboard_medico():
         return redirect(url_for('login'))
 
 # 3. NUEVA RUTA: PANEL DE CONTROL PRIVADO (DASHBOARD)
+# ==========================================
+# RUTA: PANEL DE PACIENTE (BLINDADO)
+# ==========================================
 @app.route('/dashboard')
 def dashboard():
-    # Verificamos si el usuario tiene una sesión activa
+    # 1. Verificamos que alguien haya iniciado sesión
     if 'id_usuario' in session:
-        # Si tiene memoria, le mostramos su página privada
-        return render_template('dashboard.html', nombre_usuario=session['nombre'])
-    else:
-        # Si un intruso intenta entrar directo a /dashboard, lo pateamos al login
-        return redirect(url_for('login'))
+        
+        # 2. Si el que entró es un MÉDICO, lo mandamos a su área restringida
+        if session.get('rol') == 'medico':
+            return redirect(url_for('dashboard_medico'))
+            
+        # 3. Si es paciente, lo dejamos pasar al panel azul normal
+        return render_template('dashboard.html')
+        
+    # Si no hay sesión, al login
+    return redirect(url_for('login'))
 
 # 4. NUEVA RUTA: CERRAR SESIÓN
 @app.route('/logout')
@@ -230,6 +238,27 @@ def actualizar_cita(id_cita, accion):
             db.session.commit()
             
         return redirect(url_for('solicitudes_medico'))
+    else:
+        return redirect(url_for('login'))
+    
+#ruta 10
+# ==========================================
+# RUTA: MI AGENDA (MÉDICO) - CITAS CONFIRMADAS
+# ==========================================
+@app.route('/agenda-medico')
+def agenda_medico():
+    if 'id_usuario' in session and session.get('rol') == 'medico':
+        medico_actual = Medico.query.filter_by(id_usuario=session['id_usuario']).first()
+        
+        # Traemos solo las citas que el médico ya confirmó
+        citas_confirmadas = db.session.query(Cita, Paciente, Usuario)\
+            .join(Paciente, Cita.paciente_id == Paciente.id_paciente)\
+            .join(Usuario, Paciente.id_usuario == Usuario.id_usuario)\
+            .filter(Cita.medico_id == medico_actual.id_medico)\
+            .filter(Cita.estado == 'Confirmada')\
+            .order_by(Cita.fecha, Cita.hora).all()
+            
+        return render_template('agenda_medico.html', citas=citas_confirmadas)
     else:
         return redirect(url_for('login'))
 
